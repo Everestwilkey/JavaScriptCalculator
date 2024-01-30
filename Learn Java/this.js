@@ -14,33 +14,59 @@ class Calulator {
         this.total = 0;
     }
     domath() {
-         // Reset total before each calculation
+        let operations = [];
+        let values = this.math.map(item => item[1] ? parseFloat(item[1]) : undefined).filter(value => value !== undefined);
+    
         this.math.forEach(item => {
-            if(item[0] === "null") this.total += parseInt(item[1]);
-            if(item[0] === "+") this.total += parseInt(item[1]);
-            if(item[0] === "-") this.total -= parseInt(item[1]);
-            if(item[0] === "*") this.total *= parseInt(item[1]);
-            if(item[0] === "/") this.total /= parseInt(item[1]);
+            if (item[0] && item[0] !== "=") operations.push(item[0]);
         });
+    
+        if (values.length > 0) {
+            this.total = values[0];
+        }
+    
+        for (let i = 1; i < values.length; i++) {
+            switch (operations[i - 1]) {
+                case "+":
+                    this.total += values[i];
+                    break;
+                case "-":
+                    this.total -= values[i];
+                    break;
+                case "*":
+                    this.total *= values[i];
+                    break;
+                case "/":
+                    if (values[i] !== 0) {
+                        this.total /= values[i];
+                    } else {
+                        return "Error";
+                    }
+                    break;
+            }
+        }
+    
         console.log(this.total);
-        document.getElementById('total').innerText = this.total.toString();
-        return this.total;
     }
+    
     
     InsertTuppel(operation,num1){
         if(operation === null && this.math.length === 0){
             this.math.push([null,num1]);
         }
         else if(operation === "=" ){
-            let total = this.domath(); // Store the result of this.domath()
-            operation = null;
-            this.math.forEach(item => {this.deleteTuppel();}); // Clear the array
-            this.math.push([null, total]);
+            this.math.push([operation,num1]);
+            this.domath();
+            document.getElementById('total').innerText = this.total;
+            this.math = [[]];
+            currentInput = this.total;
+            this.total = 0;
+            
         }         
         else{
             this.math.push([operation, num1]);
         }
-        inputuser = this.mathtoString();
+        
     }
     deleteTuppel(){
         this.math.pop();
@@ -55,7 +81,7 @@ class Calulator {
                 
             });
             console.log(string);
-            return string.trim();        
+            return string.trim() +" "+ currentContent;        
         }
 
 }
@@ -108,18 +134,15 @@ function Divide(){
     Clear();
 }
 function Clear(){
-    return currentInput = "", numberdisplay = "", currentContent = ""
+    return currentInput = "", numberdisplay = "", currentContent = "",currentInput = ""
  }
-
+function ClearAll(){
+    return currentInput = "", numberdisplay = "", currentContent = "",currentInput = "", calculator.math = [[]],document.getElementById('number1').innerText = calculator.mathtoString(),document.getElementById('total').innerText = calculator.total = 0;
+}
 function Enter(){
-    operation = "null";
+    operation = "="
     calculator.InsertTuppel(operation, currentInput);
     console.log(calculator.math);
-    
-    Clear();
-    operation = "=";
-    console.log(calculator.math);
-    calculator.InsertTuppel(operation, 0);
-    document.getElementById('number1').innerText = calculator.mathtoString() ;
+
 }
 
